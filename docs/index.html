@@ -129,11 +129,24 @@
       const form = document.getElementById("inquiry-form");
       if (!form) return;
       const statusEl = form.querySelector(".form-status");
+      const submitBtn = form.querySelector('button[type="submit"]');
+      const sendLabel = submitBtn ? submitBtn.textContent : "Send";
+
+      const FALLBACK_MESSAGE = "That didn't send. Email ryan@robworks.info directly.";
+
+      function setStatus(text, kind) {
+        statusEl.textContent = text;
+        statusEl.classList.remove("err", "ok");
+        if (kind) statusEl.classList.add(kind);
+      }
+
+      function resetTurnstile() {
+        if (window.turnstile) window.turnstile.reset();
+      }
 
       form.addEventListener("submit", async (e) => {
         e.preventDefault();
-        statusEl.textContent = "";
-        statusEl.classList.remove("err", "ok");
+        setStatus("", null);
 
         const turnstileEl = form.querySelector('input[name="cf-turnstile-response"]');
         const data = {
@@ -147,9 +160,14 @@
         };
 
         if (!data.name || !data.email || !data.project_type || data.message.length < 10) {
-          statusEl.textContent = "Fill in name, email, what you need, and at least 10 characters of detail.";
-          statusEl.classList.add("err");
+          setStatus("Fill in name, email, what you need, and at least 10 characters of detail.", "err");
           return;
+        }
+
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.setAttribute("aria-busy", "true");
+          submitBtn.textContent = "Sending...";
         }
 
         try {
@@ -158,14 +176,43 @@
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(data),
           });
-          if (!res.ok) throw new Error("Request failed");
-          form.reset();
-          statusEl.textContent = "Sent. I'll get back to you.";
-          statusEl.classList.add("ok");
+
+          if (res.ok) {
+            form.reset();
+            resetTurnstile();
+            setStatus("Sent. I'll get back to you.", "ok");
+            return;
+          }
+
+          let body = null;
+          try {
+            body = await res.json();
+          } catch (parseErr) {
+            body = null;
+          }
+
+          resetTurnstile();
+
+          const errorCode = body && body.error;
+          if (errorCode === "challenge") {
+            setStatus("The human-check needs to be completed again - I've reset it for you. Please try sending once more.", "err");
+          } else if (errorCode === "rate_limit") {
+            setStatus("Too many messages sent recently. Try again in a bit, or email ryan@robworks.info directly.", "err");
+          } else if (errorCode === "validation") {
+            const field = body && body.field;
+            setStatus(field ? `Please check the "${field}" field and try again.` : "One of the fields needs fixing. Please check your entries and try again.", "err");
+          } else {
+            setStatus(FALLBACK_MESSAGE, "err");
+          }
         } catch (err) {
-          statusEl.textContent = "That didn't send. Email ryan@robworks.info directly.";
-          statusEl.classList.add("err");
-          if (window.turnstile) window.turnstile.reset();
+          setStatus(FALLBACK_MESSAGE, "err");
+          resetTurnstile();
+        } finally {
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.removeAttribute("aria-busy");
+            submitBtn.textContent = sendLabel;
+          }
         }
       });
     })();

@@ -16,6 +16,7 @@
   /* Default track accent; track pages override --track. */
   --track: var(--accent-companies);
   --on-track: #0d0d0f;
+  --err: #ff8577;
 
   --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, sans-serif;
@@ -198,5 +199,10 @@ figcaption { color: var(--muted); margin-top: 0.75rem; font-size: 0.9rem; }
 .form-actions .btn { margin-top: 0; border: 0; cursor: pointer; }
 
 .form-status { font-size: 0.9rem; }
-.form-status.err { color: #ff8577; }
+.form-status.err { color: var(--err); }
 .form-status.ok { color: var(--track); }
+
+.form-actions .btn[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
