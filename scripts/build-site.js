@@ -44,8 +44,9 @@ function renderTalks(talks, partner) {
   const t = talks
     .map(
       (x) => `        <li class="row">
-          <h3>${escapeHtml(x.venue)}${x.year ? ` ${escapeHtml(x.year)}` : ""}</h3>
-          ${x.location ? `<p>${escapeHtml(x.location)}</p>` : ""}
+          <h3>${escapeHtml(x.venue)}${x.year ? ` ${escapeHtml(x.year)}` : ""}</h3>${
+        x.location ? `\n          <p>${escapeHtml(x.location)}</p>` : ""
+      }
         </li>`
     )
     .join("\n");
