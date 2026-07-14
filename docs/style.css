@@ -74,6 +74,36 @@ textarea:focus-visible {
   outline-offset: 2px;
 }
 
+/* Site navigation */
+.site-nav {
+  border-bottom: 1px solid var(--border);
+}
+
+.site-nav-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1.5rem;
+  padding: 1.1rem 1.5rem;
+}
+
+.site-nav a {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.site-nav a:hover {
+  color: var(--text);
+}
+
+.site-nav a[aria-current="page"] {
+  color: var(--track);
+}
+
 /* Display type */
 h1, h2, h3 { letter-spacing: -0.04em; line-height: 0.95; margin: 0; }
 
