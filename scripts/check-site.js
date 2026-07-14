@@ -21,7 +21,7 @@ const NUM_WORD =
   "twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety)(?:-(?:one|two|three|four|five|six|seven|eight|nine))?)";
 const BANNED = [
   {
-    re: /\d+\+?\s*keynotes?\b|\bkeynotes?\b[^.\n]{0,15}?\d+\+?/i,
+    re: /\b\d{1,3}(?!\d)\+?\s*keynote(?:s|\s+engagements?)?\b|\bkeynotes?\b(?:\s+\w+)?\s*:\s*\d{1,3}(?!\d)/i,
     why: "A numeric keynote count claim is not defensible; name venues instead",
   },
   {
