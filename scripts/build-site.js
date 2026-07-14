@@ -26,8 +26,9 @@ function readJson(name) {
 
 function replaceBetween(html, begin, end, block) {
   const s = html.indexOf(begin);
-  const e = html.indexOf(end);
-  if (s === -1 || e === -1) throw new Error(`Missing sentinel ${begin} / ${end}`);
+  if (s === -1) throw new Error(`Missing sentinel ${begin}`);
+  const e = html.indexOf(end, s + begin.length);
+  if (e === -1) throw new Error(`Missing sentinel ${end} after ${begin}`);
   return html.slice(0, s + begin.length) + "\n" + block + "\n" + html.slice(e);
 }
 
