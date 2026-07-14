@@ -168,3 +168,35 @@ footer { border-top: 1px solid var(--border); margin-top: 5rem; padding: 2rem 0;
 
 blockquote { margin: 0; font-size: 1.15rem; }
 figcaption { color: var(--muted); margin-top: 0.75rem; font-size: 0.9rem; }
+
+.inquiry { margin-top: 2rem; max-width: 38rem; }
+
+.form-row { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 1.1rem; }
+
+.form-row label {
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.form-row input,
+.form-row select,
+.form-row textarea {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font: inherit;
+  padding: 0.75rem;
+  width: 100%;
+}
+
+.hp { position: absolute; left: -9999px; }
+
+.form-actions { display: flex; align-items: center; gap: 1rem; margin-top: 1.5rem; }
+.form-actions .btn { margin-top: 0; border: 0; cursor: pointer; }
+
+.form-status { font-size: 0.9rem; }
+.form-status.err { color: #ff8577; }
+.form-status.ok { color: var(--track); }

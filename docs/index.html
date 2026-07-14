@@ -7,6 +7,7 @@
   <meta name="description" content="Technical training, workshops, curriculum design, and speaking for schools and companies. A decade in technical training. Eleven years at one company." />
   <link rel="canonical" href="https://training.robworks.info/" />
   <link rel="stylesheet" href="/style.css" />
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
@@ -70,15 +71,104 @@
 <!-- END:TESTIMONIALS -->
     </section>
 
-    <section class="cta-band" aria-label="Get in touch">
+    <section class="cta-band" id="inquire" aria-label="Start a conversation">
       <h2>Let's talk training.</h2>
       <p class="lede">Workshops, curriculum, speaking, or advisory. Tell me what you're trying to change.</p>
-      <a class="btn" href="/#inquire">Start a conversation</a>
+
+      <form id="inquiry-form" class="inquiry" action="https://contact.robworks.info/api/contact" method="POST" novalidate>
+        <div class="form-row">
+          <label for="if-name">Name</label>
+          <input id="if-name" name="name" type="text" required maxlength="120" autocomplete="name" />
+        </div>
+        <div class="form-row">
+          <label for="if-email">Email</label>
+          <input id="if-email" name="email" type="email" required maxlength="254" autocomplete="email" inputmode="email" />
+        </div>
+        <div class="form-row">
+          <label for="if-org">Organization</label>
+          <input id="if-org" name="organization" type="text" maxlength="160" autocomplete="organization" />
+        </div>
+        <div class="form-row">
+          <label for="if-type">What do you need?</label>
+          <select id="if-type" name="project_type" required>
+            <option value="">Select one</option>
+            <option value="keynote">Keynote or session</option>
+            <option value="workshop">Workshop</option>
+            <option value="curriculum">Curriculum or instructional design</option>
+            <option value="advisory">Advisory</option>
+            <option value="other">Something else</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label for="if-message">Details</label>
+          <textarea id="if-message" name="message" required minlength="10" maxlength="4000" rows="5"></textarea>
+        </div>
+
+        <!-- Honeypot: bots fill this, humans never see it. -->
+        <div class="hp" aria-hidden="true">
+          <label for="if-website">Website</label>
+          <input id="if-website" name="website" type="text" tabindex="-1" autocomplete="off" />
+        </div>
+
+        <div class="cf-turnstile" data-sitekey="0x4AAAAAADD5pA1eFNNWbjOh" data-theme="dark" data-size="flexible"></div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn">Send</button>
+          <span class="form-status" role="status" aria-live="polite"></span>
+        </div>
+      </form>
     </section>
   </main>
 
   <footer class="wrap">
     <p>Robworks Software LLC - <a href="https://robworks.info">robworks.info</a></p>
   </footer>
+
+  <script>
+    (function () {
+      const form = document.getElementById("inquiry-form");
+      if (!form) return;
+      const statusEl = form.querySelector(".form-status");
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        statusEl.textContent = "";
+        statusEl.classList.remove("err", "ok");
+
+        const turnstileEl = form.querySelector('input[name="cf-turnstile-response"]');
+        const data = {
+          name: form.name.value.trim(),
+          email: form.email.value.trim(),
+          organization: form.organization.value.trim(),
+          project_type: form.project_type.value,
+          message: form.message.value.trim(),
+          website: form.website.value,
+          "cf-turnstile-response": turnstileEl ? turnstileEl.value : "",
+        };
+
+        if (!data.name || !data.email || !data.project_type || data.message.length < 10) {
+          statusEl.textContent = "Fill in name, email, what you need, and at least 10 characters of detail.";
+          statusEl.classList.add("err");
+          return;
+        }
+
+        try {
+          const res = await fetch(form.action, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
+          });
+          if (!res.ok) throw new Error("Request failed");
+          form.reset();
+          statusEl.textContent = "Sent. I'll get back to you.";
+          statusEl.classList.add("ok");
+        } catch (err) {
+          statusEl.textContent = "That didn't send. Email ryan@robworks.info directly.";
+          statusEl.classList.add("err");
+          if (window.turnstile) window.turnstile.reset();
+        }
+      });
+    })();
+  </script>
 </body>
 </html>
