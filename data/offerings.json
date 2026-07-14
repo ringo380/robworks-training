@@ -1,0 +1,61 @@
+{
+  "_comment": "Four offerings x two sectors. `shape` is the engagement shape shown publicly. Never add a price.",
+  "offerings": [
+    {
+      "id": "keynotes",
+      "sector": "schools",
+      "title": "Keynotes & Sessions",
+      "summary": "Conference talks and district PD-day sessions on instructional design, AI in education, and building learning that transfers.",
+      "shape": "Single session, half-day, or full PD day"
+    },
+    {
+      "id": "workshops",
+      "sector": "schools",
+      "title": "Workshops",
+      "summary": "Facilitated, hands-on sessions for teachers and instructional coaches. Built around what your staff will actually do on Monday.",
+      "shape": "Half-day or multi-day cohort"
+    },
+    {
+      "id": "curriculum",
+      "sector": "schools",
+      "title": "Curriculum & Instructional Design",
+      "summary": "Course architecture, learning objectives, assessment design, and scope and sequence. Standards-aligned, built to be taught by someone other than its author.",
+      "shape": "Scoped project or curriculum sprint"
+    },
+    {
+      "id": "advisory",
+      "sector": "schools",
+      "title": "Advisory",
+      "summary": "Ongoing help on edtech selection, AI policy, and curriculum strategy for district and edtech leadership.",
+      "shape": "Advisory retainer"
+    },
+    {
+      "id": "keynotes",
+      "sector": "companies",
+      "title": "Keynotes & Sessions",
+      "summary": "Conference talks and internal all-hands sessions on enablement, technical training, and what AI actually changes about learning.",
+      "shape": "Single session or half-day"
+    },
+    {
+      "id": "workshops",
+      "sector": "companies",
+      "title": "Workshops",
+      "summary": "Hands-on skills workshops and train-the-trainer sessions for technical teams, support orgs, and partner networks.",
+      "shape": "Half-day or multi-day cohort"
+    },
+    {
+      "id": "curriculum",
+      "sector": "companies",
+      "title": "Curriculum & Instructional Design",
+      "summary": "Onboarding programs, certification tracks, and product enablement curriculum. Designed to cut ramp time, not to fill a content library.",
+      "shape": "Scoped project or curriculum sprint"
+    },
+    {
+      "id": "advisory",
+      "sector": "companies",
+      "title": "Advisory",
+      "summary": "L&D program review, LMS and LXP selection, and enablement strategy for teams standing up or rebuilding a training function.",
+      "shape": "Advisory retainer"
+    }
+  ]
+}

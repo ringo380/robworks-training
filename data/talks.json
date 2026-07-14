@@ -1,0 +1,16 @@
+{
+  "_comment": "Confirmed speaking engagements only. Every row MUST carry a source. Do not add a total count anywhere; the site names venues instead of counting them.",
+  "talks": [
+    { "venue": "cPanel Conference", "year": "2015", "location": "Houston, TX", "source": "career.md" },
+    { "venue": "cPanel Conference", "year": "2016", "location": "Houston, TX", "source": "career.md" },
+    { "venue": "cPanel Conference", "year": "2017", "location": "Fort Lauderdale, FL", "source": "career.md" },
+    { "venue": "cPanel Conference", "year": "2018", "location": "Houston, TX", "source": "career.md" },
+    { "venue": "LinuxFest", "year": "", "location": "", "source": "career.md" }
+  ],
+  "partner_training": [
+    { "location": "Kuala Lumpur, Malaysia", "source": "career.md" },
+    { "location": "Singapore", "source": "career.md" },
+    { "location": "Portugal", "source": "career.md" },
+    { "location": "France", "source": "career.md" }
+  ]
+}
