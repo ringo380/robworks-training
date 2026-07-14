@@ -16,19 +16,50 @@ const DATA = path.join(ROOT, "data");
 
 // These claims are not publicly substantiable, so the site names specific
 // venues and engagements instead of asserting counts.
+//
+// COUNT_NOUNS is the set of engagement-shaped nouns a number must not
+// directly precede - a digit or spelled-out number immediately followed by
+// one of these reads as a count of engagements, which the site cannot
+// defend. This is intentionally narrower than "any digit near these words":
+// it requires direct adjacency (number, then noun), so venue/year pairings
+// like "cPanel Conference 2015" (noun, then year) and approved figures like
+// "57 training and presentation decks" (number precedes "decks", not
+// "presentation") do not match.
+const COUNT_NOUNS =
+  "(?:speaking engagements?|engagements?|sessions?|conferences?|presentations?|workshops?|keynotes?|talks?)";
 const NUM_WORD =
-  "(?:dozens of|(?:twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|" +
+  "(?:dozens of|(?:nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|" +
   "twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety)(?:-(?:one|two|three|four|five|six|seven|eight|nine))?)";
+const RATE_NOUNS = "(?:day|session|hour|hr|engagement|talk|workshop)";
 const BANNED = [
   {
-    re: /\b\d{1,3}(?!\d)\+?\s*keynote(?:s|\s+engagements?)?\b|\bkeynotes?\b(?:\s+\w+)?\s*:\s*\d{1,3}(?!\d)/i,
+    re: new RegExp(`\\b\\d{1,3}(?!\\d)\\+?\\s+${COUNT_NOUNS}\\b`, "i"),
+    why: "A numeric count of talks/keynotes/engagements is not defensible; name venues instead",
+  },
+  {
+    re: new RegExp(`\\b${NUM_WORD}\\s+${COUNT_NOUNS}\\b`, "i"),
+    why: "A spelled-out count of talks/keynotes/engagements is not defensible; name venues instead",
+  },
+  {
+    re: /\bkeynotes?\b(?:\s+\w+)?\s*:\s*\d{1,3}(?!\d)/i,
     why: "A numeric keynote count claim is not defensible; name venues instead",
   },
   {
-    re: new RegExp(`\\b${NUM_WORD}\\s+keynotes?\\b`, "i"),
-    why: "A spelled-out keynote count claim is not defensible; name venues instead",
+    re: /\b(?:15|fifteen)\+?\s*years?\b/i,
+    why: '"15 years" of training is not supported (training roles start Apr 2015)',
   },
-  { re: /\b15\s*years?\b/i, why: '"15 years" of training is not supported (training roles start Apr 2015)' },
+  {
+    re: new RegExp(`\\$[\\d,]+(?:\\.\\d+)?k?\\s*\\/\\s*${RATE_NOUNS}\\b`, "i"),
+    why: "A published rate/price is out of scope - no public pricing",
+  },
+  {
+    re: new RegExp(`\\$[\\d,]+(?:\\.\\d+)?k?\\s*per\\s+${RATE_NOUNS}\\b`, "i"),
+    why: "A published rate/price is out of scope - no public pricing",
+  },
+  {
+    re: /\bstarting at\s*\$[\d,]+(?:\.\d+)?k?\b/i,
+    why: "A published rate/price is out of scope - no public pricing",
+  },
 ];
 const BAD_DASHES = /[‒–—―]/;
 
@@ -74,13 +105,39 @@ for (const file of htmlFiles) {
   }
 }
 
+function checkRows(fileName, rows, label, { requirePermission }) {
+  if (!Array.isArray(rows)) return;
+  rows.forEach((row, i) => {
+    const name = (row && (row.venue || row.location || row.name)) || `row ${i}`;
+    if (!row || typeof row.source !== "string" || !row.source.trim()) {
+      failures.push(`data/${fileName}: ${label}[${i}] (${name}) is missing a source`);
+    }
+    if (requirePermission && (!row || row.permission !== true)) {
+      failures.push(`data/${fileName}: ${label}[${i}] (${name}) does not have permission:true`);
+    }
+  });
+}
+
 if (fs.existsSync(DATA)) {
-  for (const f of fs.readdirSync(DATA).filter((f) => f.endsWith(".json"))) {
+  const jsonFiles = fs.readdirSync(DATA).filter((f) => f.endsWith(".json"));
+  const parsed = {};
+  for (const f of jsonFiles) {
     try {
-      JSON.parse(fs.readFileSync(path.join(DATA, f), "utf8"));
+      parsed[f] = JSON.parse(fs.readFileSync(path.join(DATA, f), "utf8"));
     } catch (err) {
       failures.push(`data/${f}: invalid JSON - ${err.message}`);
     }
+  }
+
+  if (parsed["talks.json"]) {
+    checkRows("talks.json", parsed["talks.json"].talks, "talks", { requirePermission: false });
+    checkRows("talks.json", parsed["talks.json"].partner_training, "partner_training", { requirePermission: false });
+  }
+  if (parsed["testimonials.json"]) {
+    checkRows("testimonials.json", parsed["testimonials.json"].testimonials, "testimonials", { requirePermission: true });
+  }
+  if (parsed["clients.json"]) {
+    checkRows("clients.json", parsed["clients.json"].clients, "clients", { requirePermission: true });
   }
 } else {
   console.error("check-site: note - data/ directory not found; skipping JSON validation (expected until data files land in a later task)");
