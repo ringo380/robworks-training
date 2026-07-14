@@ -122,3 +122,38 @@ h2 { font-size: var(--fs-h2); font-weight: 900; text-transform: uppercase; }
 .empty-state { color: var(--muted); border: 1px dashed var(--border); padding: 1.5rem; }
 
 footer { border-top: 1px solid var(--border); margin-top: 5rem; padding: 2rem 0; color: var(--muted); }
+
+.hero { padding: 5rem 0 2rem; }
+
+.track-card .cta {
+  margin-top: 1.5rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.8rem;
+  color: var(--on-track);
+}
+
+.shape {
+  color: var(--track) !important;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.cta-band { border-top: 1px solid var(--border); margin-top: 4rem; padding-top: 3rem; }
+
+.btn {
+  display: inline-block;
+  margin-top: 1.5rem;
+  background: var(--track);
+  color: var(--on-track);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  padding: 1rem 1.75rem;
+}
+.btn:hover { opacity: 0.88; }
+
+blockquote { margin: 0; font-size: 1.15rem; }
+figcaption { color: var(--muted); margin-top: 0.75rem; font-size: 0.9rem; }
