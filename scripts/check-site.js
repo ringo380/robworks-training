@@ -14,10 +14,20 @@ const ROOT = path.resolve(__dirname, "..");
 const DOCS = path.join(ROOT, "docs");
 const DATA = path.join(ROOT, "data");
 
-// Claims that are NOT supported by the evidence vault. See career.md.
+// These claims are not publicly substantiable, so the site names specific
+// venues and engagements instead of asserting counts.
+const NUM_WORD =
+  "(?:dozens of|(?:twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|" +
+  "twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety)(?:-(?:one|two|three|four|five|six|seven|eight|nine))?)";
 const BANNED = [
-  { re: /\b25\+?\s*keynote/i, why: '"25+ keynotes" is not supported (~6-8 talks confirmed)' },
-  { re: /\b1[2-9]\+?\s*keynote/i, why: "A keynote count claim is not defensible; name venues instead" },
+  {
+    re: /\d+\+?\s*keynotes?\b|\bkeynotes?\b[^.\n]{0,15}?\d+\+?/i,
+    why: "A numeric keynote count claim is not defensible; name venues instead",
+  },
+  {
+    re: new RegExp(`\\b${NUM_WORD}\\s+keynotes?\\b`, "i"),
+    why: "A spelled-out keynote count claim is not defensible; name venues instead",
+  },
   { re: /\b15\s*years?\b/i, why: '"15 years" of training is not supported (training roles start Apr 2015)' },
 ];
 const BAD_DASHES = /[‒–—―]/;
@@ -34,7 +44,17 @@ function walk(dir, out = []) {
 
 const failures = [];
 
-for (const file of walk(DOCS)) {
+let htmlFiles = [];
+if (!fs.existsSync(DOCS)) {
+  failures.push("docs/ directory not found - the guard has nothing to check; this is a hard failure");
+} else {
+  htmlFiles = walk(DOCS);
+  if (htmlFiles.length === 0) {
+    failures.push("docs/ contains no .html files - the guard checked nothing; this is a hard failure");
+  }
+}
+
+for (const file of htmlFiles) {
   const html = fs.readFileSync(file, "utf8");
   const rel = path.relative(ROOT, file);
 
@@ -49,6 +69,9 @@ for (const file of walk(DOCS)) {
   for (const b of begins) {
     if (!ends.includes(b)) failures.push(`${rel}: sentinel BEGIN:${b} has no matching END`);
   }
+  for (const e of ends) {
+    if (!begins.includes(e)) failures.push(`${rel}: sentinel END:${e} has no matching BEGIN`);
+  }
 }
 
 if (fs.existsSync(DATA)) {
@@ -59,6 +82,8 @@ if (fs.existsSync(DATA)) {
       failures.push(`data/${f}: invalid JSON - ${err.message}`);
     }
   }
+} else {
+  console.error("check-site: note - data/ directory not found; skipping JSON validation (expected until data files land in a later task)");
 }
 
 if (failures.length) {
